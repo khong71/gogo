@@ -32,7 +32,6 @@ func Register(ctx *fiber.Ctx) error {
 	})
 }
 
-
 func RegisterDriver(ctx *fiber.Ctx) error {
 	var RegisterDriver entity.RegisterDriver
 
@@ -44,7 +43,7 @@ func RegisterDriver(ctx *fiber.Ctx) error {
 	}
 
 	// บันทึกข้อมูลผู้ใช้ใหม่ลงในตาราง User
-	if result := database.MYSQL.Debug().Table("User").Create(&RegisterDriver); result.Error != nil {
+	if result := database.MYSQL.Debug().Table("Raiders").Create(&RegisterDriver); result.Error != nil {
 		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "ไม่สามารถเพิ่มข้อมูลได้",
 		})

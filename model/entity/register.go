@@ -15,7 +15,7 @@ type RegisterDriver struct {
 	Raider_email string `json:"raider_email"`
 	Raider_Phone int    `json:"raider_phone"`
 	Raider_image string `json:"raider_image"`
-	// Raider_numder   string `json:"raider_numder-plate"`
+	Raider_numder   string `json:"raider_numder-plate"`
 	Raider_password string `json:"raider_password"`
 	Raider_location string `json:"raider_location"`
 }
