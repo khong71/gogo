@@ -14,8 +14,6 @@ func RouteInit(r *fiber.App) {
 
 	r.Delete("DeleteUserAll", handler.DeleteUserAll)
 
-	r.Post("PostUser",handler.PostUser)
-
-
+	r.Post("Register",handler.Register)
 
 }
