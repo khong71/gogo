@@ -17,5 +17,4 @@ type RegisterDriver struct {
 	Raider_image string `json:"raider_image"`
 	Raider_numder string `json:"raider_numder"`
 	Raider_password string `json:"raider_password"`
-	Raider_location string `json:"raider_location"`
 }
