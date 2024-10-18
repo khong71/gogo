@@ -57,6 +57,9 @@ func RegisterDriver(ctx *fiber.Ctx) error {
 
 //-------------------------------------------------------------------------------------------------------
 
+
+
+//get
 func GetUsers(ctx *fiber.Ctx) error {
 	var user []entity.User
 
@@ -65,6 +68,17 @@ func GetUsers(ctx *fiber.Ctx) error {
 
 	return ctx.JSON(user)
 }
+
+func GetDriver(ctx *fiber.Ctx) error {
+	var Driver []entity.Driver
+
+	database.MYSQL.Debug().Table("Raiders").Find(&Driver)
+	ctx.JSON(Driver)
+
+	return ctx.JSON(Driver)
+}
+
+
 
 func GetUser_id(ctx *fiber.Ctx) error {
 	var idx = ctx.Query("id")
