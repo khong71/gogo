@@ -14,6 +14,13 @@ func RouteInit(r *fiber.App) {
 
 	r.Delete("DeleteUserAll", handler.DeleteUserAll)
 
-	r.Post("Register",handler.Register)
+	//Register
+	r.Post("Register", handler.Register)
+	r.Post("RegisterDriver", handler.RegisterDriver)
+
+	//Login
+
+	//get
+	r.Get("GetDriver", handler.GetDriver)
 
 }
