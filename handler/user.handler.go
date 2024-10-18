@@ -57,6 +57,7 @@ func RegisterDriver(ctx *fiber.Ctx) error {
 //-------------------------------------------------------------------------------------------------------
 //Login
 // ฟังก์ชันสำหรับ Login ผู้ใช้ (User)
+// LoginUser ใช้สำหรับเข้าสู่ระบบผู้ใช้
 func LoginUser(ctx *fiber.Ctx) error {
     var loginRequest entity.LoginUser
 
@@ -67,7 +68,7 @@ func LoginUser(ctx *fiber.Ctx) error {
         })
     }
 
-    // ค้นหาผู้ใช้ในฐานข้อมูลพร้อมตรวจสอบอีเมลและรหัสผ่าน
+    // ค้นหาผู้ใช้ในฐานข้อมูล
     var user entity.User
     if result := database.MYSQL.Debug().Table("User").Where("user_email = ?", loginRequest.User_email).First(&user); result.Error != nil {
         return ctx.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
@@ -75,7 +76,7 @@ func LoginUser(ctx *fiber.Ctx) error {
         })
     }
 
-    // ตรวจสอบรหัสผ่านทันทีหลังจากดึงข้อมูล
+    // ตรวจสอบรหัสผ่าน
     if err := bcrypt.CompareHashAndPassword([]byte(user.User_password), []byte(loginRequest.User_password)); err != nil {
         return ctx.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
             "error": "อีเมลหรือรหัสผ่านไม่ถูกต้อง",
@@ -84,7 +85,10 @@ func LoginUser(ctx *fiber.Ctx) error {
 
     // ส่งข้อความสำเร็จเมื่อ login ผ่าน
     return ctx.JSON(fiber.Map{
-        "message": "เข้าสู่ระบบสำเร็จ (User)",
+        "message": "เข้าสู่ระบบสำเร็จ",
+        "user": fiber.Map{
+            "user_email": user.User_email, // ส่งกลับอีเมลผู้ใช้ถ้าจำเป็น
+        },
     })
 }
 
