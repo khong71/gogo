@@ -58,34 +58,34 @@ func RegisterDriver(ctx *fiber.Ctx) error {
 //Login
 // ฟังก์ชันสำหรับ Login ผู้ใช้ (User)
 func LoginUser(ctx *fiber.Ctx) error {
-	var loginRequest entity.LoginUser
+    var loginRequest entity.LoginUser
 
-	// รับข้อมูลจาก request body
-	if err := ctx.BodyParser(&loginRequest); err != nil {
-		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "ไม่สามารถรับข้อมูลได้",
-		})
-	}
+    // รับข้อมูลจาก request body
+    if err := ctx.BodyParser(&loginRequest); err != nil {
+        return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+            "error": "ไม่สามารถรับข้อมูลได้",
+        })
+    }
 
-	// ค้นหาผู้ใช้ในฐานข้อมูล
-	var user entity.User
-	if result := database.MYSQL.Debug().Table("User").Where("user_email = ?", loginRequest.User_email).First(&user); result.Error != nil {
-		return ctx.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-			"error": "อีเมลหรือรหัสผ่านไม่ถูกต้อง",
-		})
-	}
+    // ค้นหาผู้ใช้ในฐานข้อมูลพร้อมตรวจสอบอีเมลและรหัสผ่าน
+    var user entity.User
+    if result := database.MYSQL.Debug().Table("User").Where("user_email = ?", loginRequest.User_email).First(&user); result.Error != nil {
+        return ctx.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+            "error": "อีเมลหรือรหัสผ่านไม่ถูกต้อง",
+        })
+    }
 
-	// ตรวจสอบรหัสผ่าน
-	if err := bcrypt.CompareHashAndPassword([]byte(user.User_password), []byte(loginRequest.User_password)); err != nil {
-		return ctx.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-			"error": "อีเมลหรือรหัสผ่านไม่ถูกต้อง",
-		})
-	}
+    // ตรวจสอบรหัสผ่านทันทีหลังจากดึงข้อมูล
+    if err := bcrypt.CompareHashAndPassword([]byte(user.User_password), []byte(loginRequest.User_password)); err != nil {
+        return ctx.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+            "error": "อีเมลหรือรหัสผ่านไม่ถูกต้อง",
+        })
+    }
 
-	// ส่งข้อความสำเร็จเมื่อ login ผ่าน
-	return ctx.JSON(fiber.Map{
-		"message": "เข้าสู่ระบบสำเร็จ (User)",
-	})
+    // ส่งข้อความสำเร็จเมื่อ login ผ่าน
+    return ctx.JSON(fiber.Map{
+        "message": "เข้าสู่ระบบสำเร็จ (User)",
+    })
 }
 
 func LoginDriver(ctx *fiber.Ctx) error {
