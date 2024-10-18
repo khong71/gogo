@@ -18,6 +18,10 @@ func RouteInit(r *fiber.App) {
 	r.Post("Register", handler.Register)
 	r.Post("RegisterDriver", handler.RegisterDriver)
 
+	//Login
+	r.Post("LoginUser", handler.LoginUser)
+	r.Post("LoginDriver", handler.LoginDriver)
+
 	//get
 	r.Get("GetDriver", handler.GetDriver)
 
