@@ -5,10 +5,10 @@ import (
 	"gogo/model/entity"
 
 	"github.com/gofiber/fiber/v2"
-	"golang.org/x/crypto/bcrypt"
 )
 
 // Register
+
 func Register(ctx *fiber.Ctx) error {
 	var Register entity.Register
 
@@ -54,81 +54,11 @@ func RegisterDriver(ctx *fiber.Ctx) error {
 		"message": "เพิ่มผู้ใช้สำเร็จ",
 	})
 }
-
-// -------------------------------------------------------------------------------------------------------
-// Login
-func Login(ctx *fiber.Ctx) error {
-	var loginRequest struct {
-		User_email    string `json:"user_email"`    // อีเมลผู้ใช้
-		User_password string `json:"user_password"` // รหัสผ่านผู้ใช้
-	}
-
-	// รับข้อมูลจาก request body
-	if err := ctx.BodyParser(&loginRequest); err != nil {
-		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "ไม่สามารถรับข้อมูลได้",
-		})
-	}
-
-	var user entity.User
-	result := database.MYSQL.Debug().Table("users").Where("user_email = ?", loginRequest.User_email).First(&user)
-
-	// ตรวจสอบว่าผู้ใช้มีอยู่หรือไม่ และรหัสผ่าน
-	if result.Error != nil || bcrypt.CompareHashAndPassword([]byte(user.User_password), []byte(loginRequest.User_password)) != nil {
-		return ctx.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-			"error": "อีเมลหรือรหัสผ่านไม่ถูกต้อง",
-		})
-	}
-
-	// ส่งข้อความสำเร็จเมื่อ login ผ่าน
-	return ctx.JSON(fiber.Map{
-		"message": "เข้าสู่ระบบสำเร็จ",
-		"user": fiber.Map{
-			"user_id":       user.User_id,
-			"user_name":     user.User_name,
-			"user_email":    user.User_email,
-			"user_location": user.User_location,
-			"user_image":    user.User_image,
-			"user_phone":    user.User_Phone,
-			"user_address":  user.User_address,
-		},
-	})
-}
-
-func LoginDriver(ctx *fiber.Ctx) error {
-	var loginRequest entity.LoginDriver
-
-	// รับข้อมูลจาก request body
-	if err := ctx.BodyParser(&loginRequest); err != nil {
-		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "ไม่สามารถรับข้อมูลได้",
-		})
-	}
-
-	// ค้นหาผู้ขับขี่ในฐานข้อมูล
-	var driver entity.Driver
-	if result := database.MYSQL.Debug().Table("Driver").Where("raider_email = ?", loginRequest.Raider_email).First(&driver); result.Error != nil {
-		return ctx.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-			"error": "อีเมลหรือรหัสผ่านไม่ถูกต้อง",
-		})
-	}
-
-	// ตรวจสอบรหัสผ่าน
-	if err := bcrypt.CompareHashAndPassword([]byte(driver.Raider_password), []byte(loginRequest.Raider_password)); err != nil {
-		return ctx.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-			"error": "อีเมลหรือรหัสผ่านไม่ถูกต้อง",
-		})
-	}
-
-	// ส่งข้อความสำเร็จเมื่อ login ผ่าน
-	return ctx.JSON(fiber.Map{
-		"message": "เข้าสู่ระบบสำเร็จ (Driver)",
-	})
-}
-
 //-------------------------------------------------------------------------------------------------------
 
-// get
+
+
+//get
 func GetUsers(ctx *fiber.Ctx) error {
 	var user []entity.User
 
@@ -146,6 +76,8 @@ func GetDriver(ctx *fiber.Ctx) error {
 
 	return ctx.JSON(Driver)
 }
+
+
 
 func GetUser_id(ctx *fiber.Ctx) error {
 	var idx = ctx.Query("id")
