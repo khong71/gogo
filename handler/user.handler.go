@@ -56,10 +56,11 @@ func RegisterDriver(ctx *fiber.Ctx) error {
 }
 //-------------------------------------------------------------------------------------------------------
 //Login
-// ฟังก์ชันสำหรับ Login ผู้ใช้ (User)
-// LoginUser ใช้สำหรับเข้าสู่ระบบผู้ใช้
-func LoginUser(ctx *fiber.Ctx) error {
-    var loginRequest entity.LoginUser
+func Login(ctx *fiber.Ctx) error {
+    var loginRequest struct {
+        User_email    string `json:"user_email"`    // อีเมลผู้ใช้
+        User_password string `json:"user_password"` // รหัสผ่านผู้ใช้
+    }
 
     // รับข้อมูลจาก request body
     if err := ctx.BodyParser(&loginRequest); err != nil {
@@ -68,9 +69,9 @@ func LoginUser(ctx *fiber.Ctx) error {
         })
     }
 
-    // ค้นหาผู้ใช้ในฐานข้อมูล
+    // ค้นหาผู้ใช้ในฐานข้อมูลโดยใช้ email
     var user entity.User
-    if result := database.MYSQL.Debug().Table("User").Where("user_email = ?", loginRequest.User_email).First(&user); result.Error != nil {
+    if result := database.MYSQL.Debug().Table("users").Where("user_email = ?", loginRequest.User_email).First(&user); result.Error != nil {
         return ctx.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
             "error": "อีเมลหรือรหัสผ่านไม่ถูกต้อง",
         })
@@ -87,7 +88,13 @@ func LoginUser(ctx *fiber.Ctx) error {
     return ctx.JSON(fiber.Map{
         "message": "เข้าสู่ระบบสำเร็จ",
         "user": fiber.Map{
-            "user_email": user.User_email, // ส่งกลับอีเมลผู้ใช้ถ้าจำเป็น
+            "user_id":    user.User_id,
+            "user_name":  user.User_name,
+            "user_email": user.User_email,
+            "user_location": user.User_location,
+            "user_image": user.User_image,
+            "user_phone": user.User_Phone,
+            "user_address": user.User_address,
         },
     })
 }
