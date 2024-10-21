@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"gogo/database"
 	"gogo/model/entity"
 
@@ -54,11 +55,77 @@ func RegisterDriver(ctx *fiber.Ctx) error {
 		"message": "เพิ่มผู้ใช้สำเร็จ",
 	})
 }
+
 //-------------------------------------------------------------------------------------------------------
 
+func Login(ctx *fiber.Ctx) error {
+	// Check Available Username
+	var user entity.User
+	
 
+	var Loginuser entity.LoginUser
 
-//get
+	fmt.Println("Email: " + Loginuser.User_email)
+
+	// รับข้อมูลจาก request body (JSON)
+	if err := ctx.BodyParser(&Loginuser); err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "ไม่สามารถรับข้อมูลได้",
+		})
+	}
+
+	err := database.MYSQL.Debug().Table("User").Find(&user, "user_email = ?", Loginuser.User_email).Error
+	if err != nil || user.User_email == "" {
+		return ctx.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"message": "อีเมลไม่ถูกต้อง",
+		})
+	}
+
+	if err != nil || user.User_password != "" {
+		if user.User_password != Loginuser.User_password {
+			return ctx.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+				"message": "รหัสผ่านไม่ถูกต้อง",
+			})
+		} else {
+			return ctx.Status(fiber.StatusUnauthorized).JSON(user)
+		}
+	}
+
+	return nil
+}
+
+func LoginDriver(ctx *fiber.Ctx) error {
+	// Check Available Username
+	var Driver entity.Driver
+
+	var raider_email = ctx.Query("raider_email")
+	var raider_password = ctx.Query("raider_password")
+
+	fmt.Println("Email: " + raider_email)
+
+	err := database.MYSQL.Debug().Table("Raiders").Find(&Driver, "raider_email = ?", ctx.Query("raider_email")).Error
+
+	if err != nil || Driver.Raider_email == "" {
+		return ctx.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"message": "wrong raider_email ",
+		})
+	}
+
+	if err != nil || Driver.Raider_password != "" {
+
+		if Driver.Raider_password != raider_password {
+			return ctx.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+				"message": "wrong raider_password",
+			})
+		} else {
+			return ctx.Status(fiber.StatusUnauthorized).JSON(Driver)
+		}
+	}
+
+	return nil
+}
+
+// get
 func GetUsers(ctx *fiber.Ctx) error {
 	var user []entity.User
 
@@ -76,8 +143,6 @@ func GetDriver(ctx *fiber.Ctx) error {
 
 	return ctx.JSON(Driver)
 }
-
-
 
 func GetUser_id(ctx *fiber.Ctx) error {
 	var idx = ctx.Query("id")
