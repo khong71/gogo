@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"gogo/database"
 	"gogo/model/entity"
 
@@ -64,9 +63,6 @@ func Login(ctx *fiber.Ctx) error {
 	
 
 	var Loginuser entity.LoginUser
-
-	fmt.Println("Email: " + Loginuser.User_email)
-
 	// รับข้อมูลจาก request body (JSON)
 	if err := ctx.BodyParser(&Loginuser); err != nil {
 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -96,14 +92,19 @@ func Login(ctx *fiber.Ctx) error {
 
 func LoginDriver(ctx *fiber.Ctx) error {
 	// Check Available Username
+
+	var LoginDriver entity.LoginDriver
+	// รับข้อมูลจาก request body (JSON)
+	if err := ctx.BodyParser(&LoginDriver); err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "ไม่สามารถรับข้อมูลได้",
+		})
+	}
+
+
 	var Driver entity.Driver
 
-	var raider_email = ctx.Query("raider_email")
-	var raider_password = ctx.Query("raider_password")
-
-	fmt.Println("Email: " + raider_email)
-
-	err := database.MYSQL.Debug().Table("Raiders").Find(&Driver, "raider_email = ?", ctx.Query("raider_email")).Error
+	err := database.MYSQL.Debug().Table("Raiders").Find(&Driver, "raider_email = ?", LoginDriver.Raider_email).Error
 
 	if err != nil || Driver.Raider_email == "" {
 		return ctx.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
@@ -113,7 +114,7 @@ func LoginDriver(ctx *fiber.Ctx) error {
 
 	if err != nil || Driver.Raider_password != "" {
 
-		if Driver.Raider_password != raider_password {
+		if Driver.Raider_password != LoginDriver.Raider_password {
 			return ctx.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 				"message": "wrong raider_password",
 			})
