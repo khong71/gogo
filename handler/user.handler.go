@@ -12,45 +12,55 @@ import (
 // Register
 
 func Register(ctx *fiber.Ctx) error {
-	var Register entity.Register
+    var Register entity.Register
 
-	// รับข้อมูลจาก request body
-	if err := ctx.BodyParser(&Register); err != nil {
-		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "ไม่สามารถรับข้อมูลได้",
-		})
-	}
+    // รับข้อมูลจาก request body
+    if err := ctx.BodyParser(&Register); err != nil {
+        return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+            "error": "ไม่สามารถรับข้อมูลได้",
+        })
+    }
 
-	// ตรวจสอบว่ามีรหัสผ่านหรือไม่
-	if Register.User_password == "" {
-		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "กรุณากรอกรหัสผ่าน",
-		})
-	}
+    // ตรวจสอบว่ามีรหัสผ่านหรือไม่
+    if Register.User_password == "" {
+        return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+            "error": "กรุณากรอกรหัสผ่าน",
+        })
+    }
 
-	// แฮชรหัสผ่าน
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(Register.User_password), bcrypt.DefaultCost)
-	if err != nil {
-		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": "ไม่สามารถแฮชรหัสผ่านได้",
-		})
-	}
+    // ตรวจสอบว่าเบอร์โทรซ้ำหรือไม่
+    var existingUser entity.Register
+    if err := database.MYSQL.Debug().Table("User").Where("user_phone = ?", Register.User_Phone).First(&existingUser).Error; err == nil {
+        // ถ้าพบเบอร์โทรซ้ำ ให้แจ้งว่าหมายเลขโทรศัพท์ซ้ำ
+        return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+            "error": "หมายเลขโทรศัพท์นี้มีการลงทะเบียนแล้ว",
+        })
+    }
 
-	// เก็บรหัสผ่านที่แฮชแล้วลงใน struct
-	Register.User_password = string(hashedPassword)
+    // แฮชรหัสผ่าน
+    hashedPassword, err := bcrypt.GenerateFromPassword([]byte(Register.User_password), bcrypt.DefaultCost)
+    if err != nil {
+        return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+            "error": "ไม่สามารถแฮชรหัสผ่านได้",
+        })
+    }
 
-	// บันทึกข้อมูลผู้ใช้ใหม่ลงในตาราง User
-	if result := database.MYSQL.Debug().Table("User").Create(&Register); result.Error != nil {
-		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": "ไม่สามารถเพิ่มข้อมูลได้",
-		})
-	}
+    // เก็บรหัสผ่านที่แฮชแล้วลงใน struct
+    Register.User_password = string(hashedPassword)
 
-	// ส่งข้อมูลผู้ใช้ที่ถูกเพิ่มกลับไป
-	return ctx.JSON(fiber.Map{
-		"message": "เพิ่มผู้ใช้สำเร็จ",
-	})
+    // บันทึกข้อมูลผู้ใช้ใหม่ลงในตาราง User
+    if result := database.MYSQL.Debug().Table("User").Create(&Register); result.Error != nil {
+        return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+            "error": "ไม่สามารถเพิ่มข้อมูลได้",
+        })
+    }
+
+    // ส่งข้อมูลผู้ใช้ที่ถูกเพิ่มกลับไป
+    return ctx.JSON(fiber.Map{
+        "message": "เพิ่มผู้ใช้สำเร็จ",
+    })
 }
+
 
 func RegisterDriver(ctx *fiber.Ctx) error {
 	var RegisterDriver entity.RegisterDriver
@@ -68,6 +78,15 @@ func RegisterDriver(ctx *fiber.Ctx) error {
 			"error": "กรุณากรอกรหัสผ่าน",
 		})
 	}
+
+	// ตรวจสอบว่าเบอร์โทรซ้ำหรือไม่
+    var existingUser entity.RegisterDriver
+    if err := database.MYSQL.Debug().Table("Raiders").Where("raider_phone = ?", RegisterDriver.Raider_Phone).First(&existingUser).Error; err == nil {
+        // ถ้าพบเบอร์โทรซ้ำ ให้แจ้งว่าหมายเลขโทรศัพท์ซ้ำ
+        return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+            "error": "หมายเลขโทรศัพท์นี้มีการลงทะเบียนแล้ว",
+        })
+    }
 
 	// แฮชรหัสผ่าน
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(RegisterDriver.Raider_password), bcrypt.DefaultCost)
