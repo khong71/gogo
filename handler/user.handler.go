@@ -221,6 +221,16 @@ func GetUser_id(ctx *fiber.Ctx) error {
 	return ctx.JSON(user)
 }
 
+func GetOrders(ctx *fiber.Ctx) error {
+	var Order entity.InsertOrder
+
+	database.MYSQL.Debug().Table("Order").Find(&Order)
+	ctx.JSON(Order)
+
+	return ctx.JSON(Order)
+}
+
+// post
 func InsertOrder(ctx *fiber.Ctx) error {
 	var order entity.InsertOrder
 
