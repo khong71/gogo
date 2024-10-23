@@ -265,3 +265,13 @@ func DeleteRaiderAll(ctx *fiber.Ctx) error {
 		"message": "ลบผู้ใช้ทั้งหมดสำเร็จ",
 	})
 }
+
+func DeleteOrderAll(ctx *fiber.Ctx) error {
+	// ลบข้อมูลผู้ใช้ทั้งหมดจากตาราง User โดยใช้ SQL ตรง
+	database.MYSQL.Debug().Exec("DELETE FROM `Order`")
+
+	// ส่งข้อความว่าลบสำเร็จ
+	return ctx.JSON(fiber.Map{
+		"message": "ลบorderทั้งหมดสำเร็จ",
+	})
+}
