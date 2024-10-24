@@ -242,16 +242,14 @@ func GetOrders(ctx *fiber.Ctx) error {
 	return ctx.JSON(orders)
 }
 
-func GetOrdersId(ctx *fiber.Ctx) error {
+func GetOrdersreceiverList(ctx *fiber.Ctx) error {
 	// รับค่า id จาก query parameter
 	id := ctx.Query("id")
 	var orders []struct {
 		OrderID         uint    `json:"order_id"`          // ID ของ Order
 		OrderInfo       *string `json:"order_info"`        // ข้อมูลเกี่ยวกับ Order
 		OrderImage      *string `json:"order_image"`       // รูปภาพของ Order
-		OrderSenderID   uint    `json:"order_sender_id"`   // ID ของผู้ส่ง
 		OrderReceiverID uint    `json:"order_receiver_id"` // ID ของผู้รับ
-		UserID          uint    `json:"user_id"`           // ID ของผู้ใช้
 		User_name       string  `json:"user_name"`         // ชื่อผู้ใช้
 		User_Phone      string  `json:"user_phone"`
 		User_image      string  `json:"user_image"`
@@ -269,7 +267,7 @@ func GetOrdersId(ctx *fiber.Ctx) error {
 		Table("Order").
 		Select("*").
 		Joins("JOIN User ON Order.order_receiver_id = User.user_id"). // กำหนดเงื่อนไขการ JOIN
-		Where("Order.order_sender_id = ?", id).                       // กำหนดเงื่อนไขการค้นหาข้อมูล
+		Where("Order.order_receiver_id = ?", id).                     // กำหนดเงื่อนไขการค้นหาข้อมูล
 		Find(&orders)
 
 	// ตรวจสอบว่ามีข้อผิดพลาดหรือไม่
@@ -387,8 +385,8 @@ func GetInfoDriver(ctx *fiber.Ctx) error {
 		UserLocation     string `json:"user_location"`
 		UserImage        string `json:"user_image"`
 		UserPhone        string `json:"user_phone"`
-		RaiderName       string `json:"raider_name"`    // Added for raider's name
-		RaiderPhone      string `json:"raider_phone"`   // Added for raider's phone
+		RaiderName       string `json:"raider_name"`  // Added for raider's name
+		RaiderPhone      string `json:"raider_phone"` // Added for raider's phone
 	}
 
 	var orders []OrderResponse
@@ -423,8 +421,6 @@ func GetInfoDriver(ctx *fiber.Ctx) error {
 	ctx.Set("Content-Type", "application/json; charset=utf-8")
 	return ctx.JSON(orders)
 }
-
-
 
 // post
 func InsertOrder(ctx *fiber.Ctx) error {
