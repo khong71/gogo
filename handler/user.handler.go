@@ -221,6 +221,16 @@ func GetUser_id(ctx *fiber.Ctx) error {
 	return ctx.JSON(user)
 }
 
+func GetRaider_id(ctx *fiber.Ctx) error {
+	var idx = ctx.Query("id")
+	var Driver []entity.Driver
+
+	database.MYSQL.Debug().Table("Raiders").Where(idx).Find(&Driver)
+	ctx.JSON(Driver)
+
+	return ctx.JSON(Driver)
+}
+
 func GetOrders(ctx *fiber.Ctx) error {
 	var orders []entity.GetOrder
 
