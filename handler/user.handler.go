@@ -258,7 +258,7 @@ func GetOrdersId(ctx *fiber.Ctx) error {
 		Table("Order").
 		Select("*").
 		Joins("JOIN User ON Order.order_receiver_id = User.user_id"). // กำหนดเงื่อนไขการ JOIN
-		Where("Order.order_receiver_id = ?", id).                     // กำหนดเงื่อนไขการค้นหาข้อมูล
+		Where("Order.order_sender_id = ?", id).                     // กำหนดเงื่อนไขการค้นหาข้อมูล
 		Find(&orders)
 
 	// ตรวจสอบว่ามีข้อผิดพลาดหรือไม่
