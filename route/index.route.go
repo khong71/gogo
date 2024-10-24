@@ -29,6 +29,7 @@ func RouteInit(r *fiber.App) {
 	//get
 	r.Get("GetDriver", handler.GetDriver)
 	r.Get("GetOrders", handler.GetOrders)
+	r.Get("GetOrdersId", handler.GetOrdersId)
 
 	
 
