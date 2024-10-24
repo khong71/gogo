@@ -222,12 +222,13 @@ func GetUser_id(ctx *fiber.Ctx) error {
 }
 
 func GetOrders(ctx *fiber.Ctx) error {
-	var Order entity.InsertOrder
+	var orders []entity.InsertOrder
 
-	database.MYSQL.Debug().Table("Order").Find(&Order)
-	ctx.JSON(Order)
+	// ควรใช้ slice เนื่องจากดึงข้อมูลหลายแถว
+	database.MYSQL.Debug().Table("Order").Find(&orders)
 
-	return ctx.JSON(Order)
+	// ส่งออกข้อมูลในรูปแบบ JSON
+	return ctx.JSON(orders)
 }
 
 // post
