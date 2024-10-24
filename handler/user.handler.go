@@ -226,7 +226,7 @@ func GetOrders(ctx *fiber.Ctx) error {
 
 	// ควรใช้ slice เนื่องจากดึงข้อมูลหลายแถว
 	database.MYSQL.Debug().Table("Order").Find(&orders)
-
+	ctx.Set("Content-Type", "application/json; charset=utf-8")
 	// ส่งออกข้อมูลในรูปแบบ JSON
 	return ctx.JSON(orders)
 }
