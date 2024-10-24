@@ -222,7 +222,7 @@ func GetUser_id(ctx *fiber.Ctx) error {
 }
 
 func GetOrders(ctx *fiber.Ctx) error {
-	var orders []entity.InsertOrder
+	var orders []entity.GetOrder
 
 	// ควรใช้ slice เนื่องจากดึงข้อมูลหลายแถว
 	database.MYSQL.Debug().Table("Order").Find(&orders)
@@ -337,6 +337,52 @@ func InsertOrder(ctx *fiber.Ctx) error {
 		"order":   order,
 	})
 }
+
+func InsertDrive(ctx *fiber.Ctx) error {
+	var drives entity.Drive
+
+	// Parse JSON body
+	if err := ctx.BodyParser(&drives); err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Cannot parse JSON",
+		})
+	}
+
+	// ทำการ insert ข้อมูลลงฐานข้อมูลโดยใช้ GORM
+	if err := database.MYSQL.Debug().Table("drive").Create(&drives).Error; err != nil {
+		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Failed to insert order",
+		})
+	}
+
+	// ส่ง response เมื่อ insert สำเร็จ
+	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "Order inserted successfully",
+		"order":   drives,
+	})
+}
+
+// func InsertDrive(ctx *fiber.Ctx) error {
+//     // สร้างตัวแปรเพื่อเก็บข้อมูลที่รับจาก body
+//     var drives entity.Drive
+
+//     // อ่านข้อมูล JSON จาก request body
+//     if err := ctx.BodyParser(&drives); err != nil {
+//         return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+//             "error": "Invalid input",
+//         })
+//     }
+
+//     // เชื่อมต่อกับฐานข้อมูลและบันทึกข้อมูล
+//     if err := database.MYSQL.Create(&drives).Error; err != nil {
+//         return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+//             "error": "Failed to insert drive",
+//         })
+//     }
+
+//     // ส่งกลับผลลัพธ์เมื่อสำเร็จ
+//     return ctx.Status(fiber.StatusCreated).JSON(drives)
+// }
 
 // Delete
 func DeleteUserAll(ctx *fiber.Ctx) error {

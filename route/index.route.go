@@ -19,6 +19,7 @@ func RouteInit(r *fiber.App) {
 	//Register
 	r.Post("Register", handler.Register)
 	r.Post("RegisterDriver", handler.RegisterDriver)
+	r.Post("InsertDrive", handler.InsertDrive)
 
 	r.Post("insertOrder", handler.InsertOrder)
 
