@@ -241,7 +241,7 @@ func GetOrdersId(ctx *fiber.Ctx) error {
 		OrderSenderID   uint    `json:"order_sender_id"`   // ID ของผู้ส่ง
 		OrderReceiverID uint    `json:"order_receiver_id"` // ID ของผู้รับ
 		UserID          uint    `json:"user_id"`           // ID ของผู้ใช้
-		User_name        string  `json:"user_name"`         // ชื่อผู้ใช้
+		User_name       string  `json:"user_name"`         // ชื่อผู้ใช้
 		User_Phone      string  `json:"user_phone"`
 		User_image      string  `json:"user_image"`
 	}
@@ -259,6 +259,46 @@ func GetOrdersId(ctx *fiber.Ctx) error {
 		Select("*").
 		Joins("JOIN User ON Order.order_receiver_id = User.user_id"). // กำหนดเงื่อนไขการ JOIN
 		Where("Order.order_sender_id = ?", id).                       // กำหนดเงื่อนไขการค้นหาข้อมูล
+		Find(&orders)
+
+	// ตรวจสอบว่ามีข้อผิดพลาดหรือไม่
+	if result.Error != nil {
+		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Failed to retrieve orders",
+		})
+	}
+
+	// ส่งข้อมูลในรูปแบบ JSON
+	ctx.Set("Content-Type", "application/json; charset=utf-8")
+	return ctx.JSON(orders)
+}
+
+func GetOrdersSendList(ctx *fiber.Ctx) error {
+	// รับค่า id จาก query parameter
+	id := ctx.Query("id")
+	var orders []struct {
+		OrderID       uint    `json:"order_id"`        // ID ของ Order
+		OrderInfo     *string `json:"order_info"`      // ข้อมูลเกี่ยวกับ Order
+		OrderImage    *string `json:"order_image"`     // รูปภาพของ Order
+		OrderSenderID uint    `json:"order_sender_id"` // ID ของผู้ส่ง
+		UserName      string  `json:"user_name"`       // ชื่อผู้ใช้ (ผู้รับ)
+		UserPhone     string  `json:"user_phone"`      // เบอร์โทรศัพท์ของผู้ใช้ (ผู้รับ)
+		UserImage     string  `json:"user_image"`      // รูปภาพของผู้ใช้ (ผู้รับ)
+	}
+
+	// ตรวจสอบว่าค่า id มีอยู่หรือไม่
+	if id == "" {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Missing 'id' query parameter",
+		})
+	}
+
+	// ใช้ GORM เพื่อทำการ JOIN ตาราง Order และ User
+	result := database.MYSQL.Debug().
+		Table("Order").
+		Select("Order.order_id, Order.order_image, Order.order_info, Order.order_sender_id, User.user_name, User.user_phone, User.user_image").
+		Joins("JOIN User ON Order.order_receiver_id = User.user_id"). // กำหนดเงื่อนไขการ JOIN
+		Where("Order.order_sender_id = ?", id).                       // กำหนดเงื่อนไขการค้นหาข้อมูลจาก sender_id
 		Find(&orders)
 
 	// ตรวจสอบว่ามีข้อผิดพลาดหรือไม่

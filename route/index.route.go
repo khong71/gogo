@@ -20,9 +20,8 @@ func RouteInit(r *fiber.App) {
 	r.Post("Register", handler.Register)
 	r.Post("RegisterDriver", handler.RegisterDriver)
 
-
 	r.Post("insertOrder", handler.InsertOrder)
-	
+
 	//Login
 	r.Post("LoginUser", handler.Login)
 	r.Post("LoginDriver", handler.LoginDriver)
@@ -30,10 +29,6 @@ func RouteInit(r *fiber.App) {
 	r.Get("GetDriver", handler.GetDriver)
 	r.Get("GetOrders", handler.GetOrders)
 	r.Get("GetOrdersId", handler.GetOrdersId)
-
-	
-
-
-	
+	r.Get("GetOrdersSendList", handler.GetOrdersSendList)
 
 }
