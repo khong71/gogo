@@ -241,7 +241,7 @@ func GetOrdersId(ctx *fiber.Ctx) error {
 		OrderSenderID   uint    `json:"order_sender_id"`   // ID ของผู้ส่ง
 		OrderReceiverID uint    `json:"order_receiver_id"` // ID ของผู้รับ
 		UserID          uint    `json:"user_id"`           // ID ของผู้ใช้
-		Username        string  `json:"user_name"`         // ชื่อผู้ใช้
+		User_name        string  `json:"user_name"`         // ชื่อผู้ใช้
 		User_Phone      string  `json:"user_phone"`
 		User_image      string  `json:"user_image"`
 	}
