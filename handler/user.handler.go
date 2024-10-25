@@ -434,7 +434,7 @@ func GetInfoDriver(ctx *fiber.Ctx) error {
 
 // post
 func InsertOrder(ctx *fiber.Ctx) error {
-	var order entity.InsertOrder
+	var order entity.GetOrder123
 
 	// Parse JSON body
 	if err := ctx.BodyParser(&order); err != nil {
