@@ -525,3 +525,54 @@ func DeleteOrderAll(ctx *fiber.Ctx) error {
 		"message": "ลบorderทั้งหมดสำเร็จ",
 	})
 }
+
+func Putstatus(ctx *fiber.Ctx) error {
+	id := ctx.Query("id")
+    var put entity.PutDrive
+
+    // Parse the request body into the PutDrive struct
+    if err := ctx.BodyParser(&put); err != nil {
+        return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+            "error": "Invalid request body",
+        })
+    }
+
+    // Update the drive record in the database
+    if err := database.MYSQL.Debug().Table("drive").Where("order_id = ?", id).Updates(put).Error; err != nil {
+        return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+            "error": "Failed to update order",
+        })
+    }
+
+    // Send a success response
+    return ctx.Status(fiber.StatusOK).JSON(fiber.Map{
+        "message": "Status updated successfully",
+        "data":    put, // Return the updated data if needed
+    })
+}
+
+func PutstatusOrder(ctx *fiber.Ctx) error {
+    id := ctx.Query("id") // Get the order ID from the query parameter
+    var put entity.PutOrder
+
+    // Parse the request body into the PutOrder struct
+    if err := ctx.BodyParser(&put); err != nil {
+        return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+            "error": "Invalid request body",
+        })
+    }
+
+    // Update the order record in the database
+    if err := database.MYSQL.Debug().Table("Order").Where("order_id = ?", id).Updates(put).Error; err != nil {
+        return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+            "error": "Failed to update order",
+        })
+    }
+
+    // Send a success response
+    return ctx.Status(fiber.StatusOK).JSON(fiber.Map{
+        "message": "Order updated successfully",
+        "data":    put, // Return the updated data if needed
+    })
+}
+

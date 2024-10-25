@@ -8,9 +8,14 @@ type InsertOrder struct {
 }
 
 type GetOrder struct {
-	Orderid int `json:"order_id" gorm:"column:order_id;primaryKey"`
+	Orderid         int    `json:"order_id" gorm:"column:order_id;primaryKey"`
 	OrderImage      string `json:"order_image"`
 	OrderInfo       string `json:"order_info"`
 	OrderSenderID   string `json:"order_sender_id"`
 	OrderReceiverID string `json:"order_receiver_id"`
+	Status          string `json:"status"`
+}
+
+type PutOrder struct {
+	Status string `json:"status"`
 }
