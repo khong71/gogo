@@ -16,7 +16,7 @@ type GetOrder struct {
 	Status          string `json:"status"`
 }
 
-type GetOrder123 struct {
+type GetOrderinsert struct {
 	Orderid         int    `json:"order_id" gorm:"column:order_id;primaryKey"`
 	OrderImage      string `json:"order_image"`
 	OrderInfo       string `json:"order_info"`
