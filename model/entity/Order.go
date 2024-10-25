@@ -22,6 +22,7 @@ type GetOrderinsert struct {
 	OrderInfo       string `json:"order_info"`
 	OrderSenderID   string `json:"order_sender_id"`
 	OrderReceiverID string `json:"order_receiver_id"`
+	Status          string `json:"status"`
 }
 
 type PutOrder struct {

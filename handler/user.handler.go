@@ -433,6 +433,7 @@ func GetInfoDriver(ctx *fiber.Ctx) error {
 }
 
 // post
+// post
 func InsertOrder(ctx *fiber.Ctx) error {
 	var order entity.GetOrderinsert
 
@@ -443,7 +444,7 @@ func InsertOrder(ctx *fiber.Ctx) error {
 		})
 	}
 
-	// ทำการ insert ข้อมูลลงฐานข้อมูลโดยใช้ GORM
+	// Insert ข้อมูลลงในฐานข้อมูลโดยใช้ GORM
 	if err := database.MYSQL.Debug().Table("Order").Create(&order).Error; err != nil {
 		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Failed to insert order",
@@ -451,6 +452,7 @@ func InsertOrder(ctx *fiber.Ctx) error {
 	}
 
 	// ส่ง response เมื่อ insert สำเร็จ
+	ctx.Set("Content-Type", "application/json; charset=utf-8")
 	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "Order inserted successfully",
 		"order":   order,
