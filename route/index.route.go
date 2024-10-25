@@ -35,6 +35,8 @@ func RouteInit(r *fiber.App) {
 	r.Get("GetOrdersSendList", handler.GetOrdersSendList)
 	r.Get("GetInfoOrder", handler.GetInfoOrder)
 	r.Get("GetInfoDriver", handler.GetInfoDriver)
+	r.Get("GetOrder_id", handler.GetOrder_id)
+	
 
 	r.Put("Putstatus", handler.Putstatus)
 	r.Put("PutstatusOrder", handler.PutstatusOrder)

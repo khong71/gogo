@@ -232,6 +232,16 @@ func GetRaider_id(ctx *fiber.Ctx) error {
 	return ctx.JSON(Driver)
 }
 
+func GetOrder_id(ctx *fiber.Ctx) error {
+	var idx = ctx.Query("id")
+	var Driver []entity.GetOrderinsert
+
+	database.MYSQL.Debug().Table("Order").Where(idx).Find(&Driver)
+	ctx.JSON(Driver)
+
+	return ctx.JSON(Driver)
+}
+
 func GetOrders(ctx *fiber.Ctx) error {
 	var orders []entity.GetOrder
 
@@ -249,6 +259,9 @@ func GetOrders(ctx *fiber.Ctx) error {
 	// ส่งออกข้อมูลในรูปแบบ JSON
 	return ctx.JSON(orders)
 }
+
+
+
 
 func GetOrdersreceiverList(ctx *fiber.Ctx) error {
 	// รับค่า id จาก query parameter
@@ -361,7 +374,7 @@ func GetInfoOrder(ctx *fiber.Ctx) error {
 	// Query to join Order with UserSender and UserReceiver only
 	result := database.MYSQL.Debug().
 		Table("Order").
-		Select("Order.order_id, Order.order_sender_id, Order.order_receiver_id, Order.order_image, Order.order_info, UserSender.user_name AS user_sender_name, UserReceiver.user_name AS user_receiver_name, UserSender.user_location AS user_location, UserSender.user_image AS user_image, UserSender.user_phone AS user_phone").
+		Select("*").
 		Joins("JOIN User AS UserSender ON UserSender.user_id = Order.order_sender_id").
 		Joins("JOIN User AS UserReceiver ON UserReceiver.user_id = Order.order_receiver_id").
 		Where("Order.order_receiver_id = ?", id).
