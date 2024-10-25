@@ -233,14 +233,21 @@ func GetRaider_id(ctx *fiber.Ctx) error {
 }
 
 func GetOrders(ctx *fiber.Ctx) error {
-	var orders []entity.GetOrder
+    var orders []entity.GetOrder
 
-	// ควรใช้ slice เนื่องจากดึงข้อมูลหลายแถว
-	database.MYSQL.Debug().Table("Order").Find(&orders)
-	ctx.Set("Content-Type", "application/json; charset=utf-8")
-	// ส่งออกข้อมูลในรูปแบบ JSON
-	return ctx.JSON(orders)
+    // Use a slice to retrieve multiple rows with status = 0
+    if err := database.MYSQL.Debug().Table("Order").Where("status = ?", 0).Find(&orders).Error; err != nil {
+        // Handle the error and return an appropriate response
+        return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+            "error": "Failed to retrieve orders",
+        })
+    }
+
+    ctx.Set("Content-Type", "application/json; charset=utf-8")
+    // Return the retrieved orders in JSON format
+    return ctx.JSON(orders)
 }
+
 
 func GetOrdersreceiverList(ctx *fiber.Ctx) error {
 	// รับค่า id จาก query parameter
