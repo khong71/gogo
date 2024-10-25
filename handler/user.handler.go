@@ -534,6 +534,16 @@ func DeleteOrderAll(ctx *fiber.Ctx) error {
 	})
 }
 
+func DeleteDriverAll(ctx *fiber.Ctx) error {
+	// ลบข้อมูลผู้ใช้ทั้งหมดจากตาราง User โดยใช้ SQL ตรง
+	database.MYSQL.Debug().Exec("DELETE FROM `drive`")
+
+	// ส่งข้อความว่าลบสำเร็จ
+	return ctx.JSON(fiber.Map{
+		"message": "ลบdriveทั้งหมดสำเร็จ",
+	})
+}
+
 func Putstatus(ctx *fiber.Ctx) error {
 	id := ctx.Query("id")
 	var put entity.PutDrive
