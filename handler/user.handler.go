@@ -393,6 +393,54 @@ func GetInfoOrder(ctx *fiber.Ctx) error {
 	return ctx.JSON(orders)
 }
 
+func GetOrdername(ctx *fiber.Ctx) error {
+	// รับค่า id จาก query parameter
+	id := ctx.Query("id")
+
+	type OrderResponse struct {
+		OrderID          string `json:"order_id"`
+		OrderSenderID    string `json:"order_sender_id"`
+		OrderReceiverID  string `json:"order_receiver_id"`
+		OrderImage       string `json:"order_image"`
+		OrderInfo        string `json:"order_info"`
+		UserSenderName   string `json:"user_sender_name"`
+		UserReceiverName string `json:"user_receiver_name"`
+		UserLocation     string `json:"user_location"`
+		UserImage        string `json:"user_image"`
+		UserPhone        string `json:"user_phone"`
+	}
+
+	var orders []OrderResponse
+
+	// ตรวจสอบว่าค่า id มีอยู่หรือไม่
+	if id == "" {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Missing 'id' query parameter",
+		})
+	}
+
+	// Query to join Order with UserSender and UserReceiver only
+	result := database.MYSQL.Debug().
+		Table("Order").
+		Select("*").
+		Joins("JOIN User AS UserSender ON UserSender.user_id = Order.order_sender_id").
+		Joins("JOIN User AS UserReceiver ON UserReceiver.user_id = Order.order_receiver_id").
+		Where("Order.order_id = ?", id).
+		Find(&orders)
+
+	// ตรวจสอบว่ามีข้อผิดพลาดหรือไม่
+	if result.Error != nil {
+		log.Printf("Failed to retrieve orders: %v", result.Error)
+		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Failed to retrieve orders",
+		})
+	}
+
+	// ส่งข้อมูลในรูปแบบ JSON
+	ctx.Set("Content-Type", "application/json; charset=utf-8")
+	return ctx.JSON(orders)
+}
+
 func GetInfoDriver(ctx *fiber.Ctx) error {
 	// รับค่า id จาก query parameter
 	id := ctx.Query("id")
